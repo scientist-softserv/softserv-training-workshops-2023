@@ -8,7 +8,7 @@ To view the README at that point, please refer to the drop down at the bottom of
 - Date: September 6, 2023
 - Instructor: [Summer Cook](https://github.com/summer-cook)
 <details>
-  <summary> Arch linux specific changes </summary> 
+  <summary> Networking DNS: Arch linux specific changes </summary> 
 on arch dory is not working for me. to resolve it
 1. see changes in the doker-compose.yml and .env 
 2.  add to /etc/hosts ech individual tenant 
@@ -16,7 +16,12 @@ on arch dory is not working for me. to resolve it
  127.0.0.1 localhost demo.localhost test.localhost
 ``` 
 access the apps via localhost:3000, test.localhost:3000
-
+</details>
+<details>
+  <summary> Upload lile error: linux (Arch, Ubuntu) specific changes </summary> 
+2. change permission to the tmp directory on the host , `chmod 777 -R ./tmp`
+This is to be improved since files should not be readable and writable to all users on the system only to make uploads work in the container.
+</details>
 
 ### Session 2: Work Types
 - Date: September 13, 2023
