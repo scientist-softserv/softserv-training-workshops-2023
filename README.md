@@ -7,6 +7,16 @@ To view the README at that point, please refer to the drop down at the bottom of
 ### Session 1: Spinning Up a Samvera Application
 - Date: September 6, 2023
 - Instructor: [Summer Cook](https://github.com/summer-cook)
+<details>
+  <summary> Arch linux specific changes </summary> 
+on arch dory is not working for me. to resolve it
+1. see changes in the doker-compose.yml and .env 
+2.  add to /etc/hosts ech individual tenant 
+```bash 
+ 127.0.0.1 localhost demo.localhost test.localhost
+``` 
+access the apps via localhost:3000, test.localhost:3000
+
 
 ### Session 2: Work Types
 - Date: September 13, 2023
