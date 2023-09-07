@@ -67,7 +67,7 @@ services:
       - SOLR_ENABLE_AUTHENTICATION=yes
       - ZK_HOST=zoo:2181
       - VIRTUAL_PORT=8983
-      - VIRTUAL_HOST=solr.hyku.test
+      - VIRTUAL_HOST=solr.localhost
     user: root
     command: bash -c "
       chown -R 8983:8983 /var/solr
@@ -97,7 +97,7 @@ services:
       - .env
     environment:
       - VIRTUAL_PORT=8080
-      - VIRTUAL_HOST=fcrepo.hyku.test
+      - VIRTUAL_HOST=fcrepo.localhost
       - JAVA_OPTS=${JAVA_OPTS} -Dfcrepo.modeshape.configuration="classpath:/config/file-simple/repository.json" -Dfcrepo.object.directory="/data/objects" -Dfcrepo.binary.directory="/data/binaries"
     expose:
       - 8080
@@ -113,7 +113,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USER}
       - VIRTUAL_PORT=5432
-      - VIRTUAL_HOST=db.hyku.test
+      - VIRTUAL_HOST=db.localhost
     volumes:
       - db:/var/lib/postgresql/data
     networks:
@@ -133,7 +133,7 @@ services:
     # command: sleep infinity
     environment:
       - VIRTUAL_PORT=3000
-      - VIRTUAL_HOST=.hyku.test
+      - VIRTUAL_HOST=.localhost
     depends_on:
       db:
         condition: service_started
@@ -236,4 +236,4 @@ services:
     environment:
       - JAVA_OPTS=-Dwebdriver.chrome.whitelistedIps=
       - VIRTUAL_PORT=7900
-      - VIRTUAL_HOST=chrome.hyku.test
+      - VIRTUAL_HOST=chrome.localhost
