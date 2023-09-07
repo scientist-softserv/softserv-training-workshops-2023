@@ -176,12 +176,11 @@ Hyrax.config do |config|
     # Comment this next line to allow universal viewer to work in development
     # Issue with Hyrax v 2.9.0 where IIIF has mixed content error when running with SSL enabled
     # See Samvera Slack thread https://samvera.slack.com/archives/C0F9JQJDQ/p1596718417351200?thread_ts=1596717896.350700&cid=C0F9JQJDQ
-    base_url = base_url.sub(/\Ahttp:/, 'https:')
-    Riiif::Engine.routes.url_helpers.image_url(file_id, host: base_url, size: size)
+    Riiif::Engine.routes.url_helpers.image_url(file_id, size: size, only_path: true)
   end
 
   config.iiif_info_url_builder = lambda do |file_id, base_url|
-    uri = Riiif::Engine.routes.url_helpers.info_url(file_id, host: base_url)
+    uri = Riiif::Engine.routes.url_helpers.info_url(file_id, only_path: true)
     uri = uri.sub(%r{/info\.json\Z}, '')
     # Comment this next line to allow universal viewer to work in development
     # Issue with Hyrax v 2.9.0 where IIIF has mixed content error when running with SSL enabled
