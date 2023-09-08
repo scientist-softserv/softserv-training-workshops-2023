@@ -19,8 +19,13 @@ access the apps via localhost:3000, test.localhost:3000
 </details>
 <details>
   <summary> Upload lile error: linux (Arch, Ubuntu) specific changes </summary> 
-2. change permission to the tmp directory on the host , `chmod 777 -R ./tmp`
+change permission to the tmp directory on the host , `chmod 777 -R ./tmp`
 This is to be improved since files should not be readable and writable to all users on the system only to make uploads work in the container.
+</details>
+<details>
+  <summary> Install Universl Viewer inrails development mode </summary> 
+1. connect to the web container `docker compose exec web bash` and   
+2. run `yarn isntall`
 </details>
 
 ### Session 2: Work Types
