@@ -8,24 +8,45 @@ To view the README at that point, please refer to the drop down at the bottom of
 - Date: September 6, 2023
 - Instructor: [Summer Cook](https://github.com/summer-cook)
 <details>
-  <summary> Networking DNS: Arch linux specific changes </summary> 
+  <summary>Fix Networking DNS: Arch linux specific changes </summary> 
+
 on arch dory is not working for me. to resolve it
+
 1. see changes in the doker-compose.yml and .env 
+
 2.  add to /etc/hosts ech individual tenant 
+
 ```bash 
- 127.0.0.1 localhost demo.localhost test.localhost
+ 127.0.0.1 localhost demo.localhost test.locualhost
 ``` 
+
 access the apps via localhost:3000, test.localhost:3000
+
 </details>
+
 <details>
-  <summary> Upload lile error: linux (Arch, Ubuntu) specific changes </summary> 
-change permission to the tmp directory on the host , `chmod 777 -R ./tmp`
-This is to be improved since files should not be readable and writable to all users on the system only to make uploads work in the container.
+  <summary>Fix Upload file error: linux (Arch, Ubuntu) specific changes </summary> 
+
+Apply acl's to the host system files if user uid on the host system is different from the user in the web container. The user `app` in the docker container has uid 1001 and needs to get access to some directories and files which are bind mount.
+
+In the hyku repository root dir on the host run the following three commands which set the acls accordingly to directories, files and files with executable flag 
+
+1. `find . -type d -exec setfacl --modify=user:1001:rwx {} \; `
+
+2. `find . -type f -exec setfacl --modify=user:1001:rw  {} \; `
+
+3. `find . -type f -perm /u+x,g+x -exec setfacl --modify=user:1001:rwx {} \; `
+
 </details>
+
 <details>
-  <summary> Install Universl Viewer inrails development mode </summary> 
+
+  <summary>Fix universal viewer: Install assets in rails development mode </summary> 
+
 1. connect to the web container `docker compose exec web bash` and   
-2. run `yarn isntall`
+
+2. run `yarn install`
+
 </details>
 
 ### Session 2: Work Types
