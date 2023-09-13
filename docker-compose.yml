@@ -8,6 +8,7 @@ x-app: &app
       - ghcr.io/samvera/hyku/base:${TAG:-latest}
       - ghcr.io/samvera/hyku:${TAG:-latest}
   image: ghcr.io/samvera/hyku:${TAG:-latest}
+  user: ${CONTAINER_UID}:${CONTAINER_GID}
   env_file:
     - .env
   # NOTE: all common env variables moved to .env
@@ -190,9 +191,9 @@ services:
     entrypoint: ["sh", "-x", "-c"]
     command:
       - >
-        chown -R app:app /app/samvera/hyrax-webapp/public/uploads &&
-        chown -R app:app /app/samvera/hyrax-webapp/public/assets &&
-        chown -R app:app /app/samvera/hyrax-webapp/tmp
+        chown -R ${CONTAINER_UID}:${CONTAINER_GID} /app/samvera/hyrax-webapp/public/uploads &&
+        chown -R ${CONTAINER_UID}:${CONTAINER_GID} /app/samvera/hyrax-webapp/public/assets &&
+        chown -R ${CONTAINER_UID}:${CONTAINER_GID} /app/samvera/hyrax-webapp/tmp
 
   initialize_app:
     <<: *app

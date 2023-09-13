@@ -95,6 +95,26 @@ docker-compose up web
 
 This command starts the whole stack in individual containers allowing Rails to be started or stopped independent of the other services.  Once that starts (you'll see the line `Passenger core running in multi-application mode.` or `Listening on tcp://0.0.0.0:3000` to indicate a successful boot), you can view your app in a web browser at either hyku.test or localhost:3000 (see above).  When done `docker-compose stop` shuts down everything.
 
+#### File Permissions
+If you have file permission issues, it is likely that your docker set up does not translate the user id and group id of mounted directories. If this is the case you can set CONTAINER_UID and CONTAINER_GID environment variables to your local user and then restart your containers. We recommend setting these in your .bashrc or .zshrc so that they persist.
+
+```bash
+$ docker compose up web
+> can not write db/schema.rb, ENOPERM
+> initialize_app failed
+
+# edit .bashrc or .zshrc and add
+#   export CONTAINER_UID=$(id -u)
+#   export CONTAINER_GID=$(id -g)
+# don't forget to close and reopen your shell
+
+$ docker compose down -v
+# make sure everything is removed
+
+$ docker compose up web
+
+```
+
 #### Troubleshooting on Windows
 1. Dory is running but you're unable to access hyku.test:
     - Run this in the terminal: `ip addr | grep eth0 | grep inet`
