@@ -15,14 +15,14 @@ x-app: &app
     - node_modules:/app/samvera/hyrax-webapp/node_modules:cached
     - uploads:/app/samvera/hyrax-webapp/public/uploads:cached
     - assets:/app/samvera/hyrax-webapp/public/assets:cached
-    - cache:/app/samvera/hyrax-webapp/tmp/cache:cached
+    - tmp:/app/samvera/hyrax-webapp/tmp:cached
     - .:/app/samvera/hyrax-webapp
   networks:
     internal:
 
 volumes:
   assets:
-  cache:
+  tmp:
   db:
   fcrepo:
   node_modules:
@@ -192,7 +192,7 @@ services:
       - >
         chown -R app:app /app/samvera/hyrax-webapp/public/uploads &&
         chown -R app:app /app/samvera/hyrax-webapp/public/assets &&
-        chown -R app:app /app/samvera/hyrax-webapp/tmp/cache
+        chown -R app:app /app/samvera/hyrax-webapp/tmp
 
   initialize_app:
     <<: *app
