@@ -53,6 +53,11 @@ In the hyku repository root dir on the host run the following three commands whi
 - Date: September 13, 2023
 - Instructor: [Shana Moore](https://github.com/ShanaLMoore)
 
+The instructions are https://gist.github.com/ShanaLMoore/df8562ab13f15ab3a7cc347d61431944
+
+
+
+
 ### Session 3: Customizing Search and Facets
 - Date: September 20, 2023
 - Instructor: [Kait Sewell](https://github.com/K8Sewell)
