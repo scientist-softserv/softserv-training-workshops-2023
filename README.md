@@ -1,5 +1,6 @@
 # SoftServ Training Workshops 2023
 
+
 This repository is a fork of the latest version of [Hyku](https://github.com/samvera/hyku) as of September 5, 2023. Commit sha: [`10c56d8`](https://github.com/samvera/hyku/tree/10c56d88485206aadb1c1cc5d4bec205c10205f0) (~6 months ahead of `v5.0.1`)
 
 To view the README at that point, please refer to the drop down at the bottom of this file.
