@@ -49,4 +49,7 @@ en:
           subject_tesim: Subject
           title_tesim: Title
       sort:
-        title_tesim: Title  
+        title_field: Title  
+        relevance: relevance
+        uploaded_field: data uploaded
+        modified_field: data modified

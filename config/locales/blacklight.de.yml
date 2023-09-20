@@ -48,4 +48,7 @@ de:
           subject_tesim: Fach
           title_tesim: Titel
       sort:
-        title_tesim: Titel German
+        title_field: "Titel df"
+        relevance: "Relevanz"
+        uploaded_field: Datum hochgeladen
+        modified_field: Datum geändert

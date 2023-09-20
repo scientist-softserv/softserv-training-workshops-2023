@@ -67,7 +67,7 @@ class CatalogController < ApplicationController
     config.tag_cloud_field_name = 'tag_sim'
 
     # solr field configuration for document/show views
-    config.index.title_field = 'title_tesim'
+    config.index.title_field = 'title_ssim'
     config.index.display_type_field = 'has_model_ssim'
     config.index.thumbnail_field = 'thumbnail_path_ss'
 
@@ -354,12 +354,12 @@ class CatalogController < ApplicationController
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
     # label is key, solr field is value
-    config.add_sort_field "score desc, #{uploaded_field} desc", label: "relevance"
-    config.add_sort_field "#{uploaded_field} desc", label: "date uploaded \u25BC"
-    config.add_sort_field "#{uploaded_field} asc", label: "date uploaded \u25B2"
-    config.add_sort_field "#{modified_field} desc", label: "date modified \u25BC"
-    config.add_sort_field "#{modified_field} asc", label: "date modified \u25B2"
-    config.add_sort_field "#{title_field} asc", label: "#{I18n.t("blacklight.search.sort.title_tesim")} \u25B2 "
+    config.add_sort_field "score desc, #{uploaded_field} desc", label: "#{I18n.t("blacklight.search.sort.relevance")}"
+    config.add_sort_field "#{uploaded_field} desc", label: "#{I18n.t("blacklight.search.sort.uploaded_field")} \u25BC"
+    config.add_sort_field "#{uploaded_field} asc", label: "#{I18n.t("blacklight.search.sort.uploaded_field")} \u25B2"
+    config.add_sort_field "#{modified_field} desc", label: "#{I18n.t("blacklight.search.sort.modified_field")} \u25BC"
+    config.add_sort_field "#{modified_field} asc", label: "#{I18n.t("blacklight.search.sort.modified_field")} \u25B2"
+    config.add_sort_field "#{title_field} asc", label: "#{I18n.t("blacklight.search.sort.title_field")} \u25B2"
 
     # OAI Config fields
     config.oai = {
