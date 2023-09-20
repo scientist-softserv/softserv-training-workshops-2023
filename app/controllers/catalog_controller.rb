@@ -16,6 +16,10 @@ class CatalogController < ApplicationController
     'system_modified_dtsi'
   end
 
+  def self.title_field
+    'title_ssim'
+  end
+
   # CatalogController-scope behavior and configuration for BlacklightIiifSearch
   include BlacklightIiifSearch::Controller
 
@@ -355,6 +359,7 @@ class CatalogController < ApplicationController
     config.add_sort_field "#{uploaded_field} asc", label: "date uploaded \u25B2"
     config.add_sort_field "#{modified_field} desc", label: "date modified \u25BC"
     config.add_sort_field "#{modified_field} asc", label: "date modified \u25B2"
+    config.add_sort_field "#{title_field} asc", label: "#{I18n.t("blacklight.search.sort.title_tesim")} \u25B2 "
 
     # OAI Config fields
     config.oai = {

@@ -47,3 +47,5 @@ de:
           rights_tesim: Rechte
           subject_tesim: Fach
           title_tesim: Titel
+      sort:
+        title_tesim: Titel German
