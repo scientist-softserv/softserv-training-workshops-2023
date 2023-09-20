@@ -5,6 +5,8 @@ en:
       fields:
         facet:
           based_near_label_sim: Location
+          resource_type_sim: Resource Type
+          department_sim: Department
           creator_sim: Creator
           file_format_sim: Format
           generic_type_sim: Type
