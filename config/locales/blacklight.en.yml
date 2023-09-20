@@ -11,6 +11,7 @@ en:
           file_format_sim: Format
           generic_type_sim: Type
           depositor_ssim: Depositor
+          human_readable_type_sim: Type
           keyword_sim: Keyword
           language_sim: Language
           publisher_sim: Publisher

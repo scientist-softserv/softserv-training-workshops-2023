@@ -73,11 +73,11 @@ class CatalogController < ApplicationController
 
     # solr fields that will be treated as facets by the blacklight application
     #   The ordering of the field names is the order of the display
-    config.add_facet_field 'human_readable_type_sim', label: "Type", limit: 5
+    config.add_facet_field 'human_readable_type_sim', label: "I18n.t(blacklight.search.fields.facet.human_readable_type_sim)", limit: 5
     config.add_facet_field 'department_sim', label: "Department", limit: 5
     config.add_facet_field 'resource_type_sim', label: "Resource Type", limit: 5
     config.add_facet_field 'creator_sim', limit: 5
-    config.add_facet_field 'contributor_sim', label: "Contributor", limit: 5
+    config.add_facet_field 'contributor_sim', label: "I18n.t(blacklight.search.fields.facet.contributor_sim)", limit: 5
     config.add_facet_field 'keyword_sim', limit: 5
     config.add_facet_field 'subject_sim', limit: 5
     config.add_facet_field 'language_sim', limit: 5
@@ -354,12 +354,12 @@ class CatalogController < ApplicationController
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
     # label is key, solr field is value
-    config.add_sort_field "score desc, #{uploaded_field} desc", label: "#{I18n.t("blacklight.search.sort.relevance")}"
+    config.add_sort_field "score desc, #{uploaded_field} desc", label: I18n.t("blacklight.search.sort.relevance")
     config.add_sort_field "#{uploaded_field} desc", label: "#{I18n.t("blacklight.search.sort.uploaded_field")} \u25BC"
     config.add_sort_field "#{uploaded_field} asc", label: "#{I18n.t("blacklight.search.sort.uploaded_field")} \u25B2"
     config.add_sort_field "#{modified_field} desc", label: "#{I18n.t("blacklight.search.sort.modified_field")} \u25BC"
     config.add_sort_field "#{modified_field} asc", label: "#{I18n.t("blacklight.search.sort.modified_field")} \u25B2"
-    config.add_sort_field "#{title_field} asc", label: "#{I18n.t("blacklight.search.sort.title_field")} \u25B2"
+    config.add_sort_field "#{title_field} asc", label: "#{I18n.t("blacklight.search.sort.title_field")} \u25B2 "
 
     # OAI Config fields
     config.oai = {

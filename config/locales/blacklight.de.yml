@@ -7,9 +7,11 @@ de:
         facet:
           based_near_label_sim: Ort
           creator_sim: Schöpfer
+          contributor_sim: Beitragender
           depositor_ssim: Einleger
           file_format_sim: Format
           generic_type_sim: Art
+          human_readable_type_sim: Typ
           keyword_sim: Stichwort
           language_sim: Sprache
           publisher_sim: Herausgeber
