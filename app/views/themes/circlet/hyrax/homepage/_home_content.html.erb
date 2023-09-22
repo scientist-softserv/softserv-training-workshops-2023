@@ -1,0 +1,27 @@
+<%# add check for featured researcher %>
+<div class="row">
+  <div class="col-sm-6">
+    <% if @presenter.display_featured_researcher? %>
+      <h2 class="sr-only"><%= t('hyrax.homepage.featured_researcher.title') %></h2>
+      <div class="featured-researcher">
+        <h2 class=""><%= t('hyrax.homepage.featured_researcher.title') %></h2>
+        <%= render 'featured_researcher' %>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-sm-6">
+    <h2 class="sr-only"><%= t('hyrax.homepage.admin_sets.title') %></h2>
+    <h2 class=""><%= t('hyrax.homepage.admin_sets.title') %></h2>
+      <%= render 'featured_collection_section' %>
+  </div>
+</div>
+<div class="row">
+  <% if @presenter.display_featured_works? %>
+    <h2>Featured Works</h2>
+    <%= render 'featured_works' %>
+  <% end %>
+</div>
+    
+
+  
+
