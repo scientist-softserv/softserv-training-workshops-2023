@@ -12,6 +12,8 @@ Here you'll find the workshop's concepts and exercises that are meant to go alon
 - [Setup Instructions](#setup-instructions)
 - [Concepts](#concepts)
 - [Exercises](#exercises)
+  - [[1] Install Bulkrax](#1-install-bulkrax)
+  - [[2] Remove non CSV parsers](#2-remove-non-csv-parsers)
 ---
 
 ## Setup Instructions
@@ -19,7 +21,7 @@ You can use this branch as a working example, to check your progress against as 
 
 For your actual work, please checkout and make a branch off of main or continue on a branch from a previous workshop.
 
-```
+``` bash
 git clone https://github.com/scientist-softserv/softserv-training-workshops-2023
 git checkout main
 git checkout -b branch-name
@@ -45,11 +47,12 @@ Visit `hyku.test/proprietor/accounts?locale=en`. Click "Create new account" to e
 ## Concepts
 ### What is bulkrax?
 Bulkrax is a batteries included importer for Samvera applications. It currently includes support for OAI-PMH (DC and Qualified DC) and CSV out of the box. It is also designed to be extensible, allowing you to easily add new importers in to your application or to include them with other gems. Bulkrax provides a full admin interface including creating, editing, scheduling and reviewing imports.
+
 ## Exercises
 ### [1] Install bulkrax
 Today we will be working from the latest released version, [v5.4.0](https://github.com/samvera-labs/bulkrax/releases/tag/v5.4.0)
 
-```
+``` bash
 # Update the Bulkrax version in the Gemfile
 # We are locking bulkrax to this version to ensure these instructions always apply
 gem 'bulkrax', '5.4.0'
@@ -59,4 +62,32 @@ bundle install
 ```
 - _NOTE: since bulkrax is already in hyku, we do not have to run the generate or migrate commands found in the [bulkrax readme](https://github.com/samvera-labs/bulkrax#install-generator)._
 
+### [2] Remove non CSV parsers
+By default, bulkrax comes installed with 5 parsers. They are listed in bulkrax's ["lib/bulkrax.rb"](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L104-L111) file. Visit the "/importers" endpoint and click the dropdown underneath the `Parser` heading. Here we'll see the 5 parser's listed.
+
+However, for the purposes of this workshop, we'll only be dealing with the CSV parser, so we will remove the others. In "config/initializers/bulkrax.rb" add the code below underneath the commented out "add local parsers" section.
+
+``` bash
+# Remove local parsers
+config.parsers -= [
+      { name: "OAI - Dublin Core", class_name: "Bulkrax::OaiDcParser", partial: "oai_fields" },
+      { name: "OAI - Qualified Dublin Core", class_name: "Bulkrax::OaiQualifiedDcParser", partial: "oai_fields" },
+      { name: "Bagit", class_name: "Bulkrax::BagitParser", partial: "bagit_fields" },
+      { name: "XML", class_name: "Bulkrax::XmlParser", partial: "xml_fields" }
+    ]
+```
+
+This is a configuration change so we will not see the effect by refreshing the page. Instead we must restart the server using one of the commands below:
+``` bash
+# Use the restart command
+docker compose exec web sh
+pumactl restart -p 1
+
+# Stop and restart the container
+Ctrl-C
+docker compose stop
+docker compose up web
+```
+
+Refresh the page now and only the "CSV" parser should show as an option.
 
