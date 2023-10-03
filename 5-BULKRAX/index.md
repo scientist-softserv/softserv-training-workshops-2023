@@ -18,6 +18,7 @@ Here you'll find the workshop's concepts and exercises that are meant to go alon
   - [[1] Install Bulkrax](#1-install-bulkrax)
   - [[2] Remove non CSV parsers](#2-remove-non-csv-parsers)
   - [[3] Import required fields only](#3-import-required-fields-only)
+  - [[4] Import fields without custom mapping](#4-import-fields-without-custom-mapping)
 ---
 
 ## Setup Instructions
@@ -132,4 +133,11 @@ Go to the works index page and see your newly imported work!
 
 How was a work created if we only listed a title and source_identifier on the CSV?
 Excellent question! In your app bulkrax config file there's a `config.default_work_type` property. By default, it's set to `Hyrax.config.curation_concerns.first`. We have not updated that value, therefore our imported data was created as a GenericWork.
+
+### [4] Import fields without custom mapping
+In addition to the required fields, we are able to import a file that has other column names. Without adding any further custom mapping, Bulkrax will automatically handle column names that are the same as the attribute found on the work type. e.g., the GenericWork work type has an attribute called `creator`, so the value in a column named `creator` will map to it with no additional setup needed.
+
+This works because bulkrax will use the [default_field_mapping](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L187-L200) in order to correctly assign the imported data as the attributes on the appropriate Work.
+
+Sample CSV [here](./fixtures/no-custom-mapping.csv)
 
