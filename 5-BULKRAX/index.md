@@ -84,6 +84,7 @@ Today we will be working from the latest released version, [v5.4.1](https://gith
 gem 'bulkrax', '5.4.1'
 
 # Update bulkrax
+docker compose exec web sh
 bundle install
 ```
 > _NOTE: since bulkrax is already in hyku, we do not have to run the generate or migrate commands found in the [bulkrax readme](https://github.com/samvera-labs/bulkrax#install-generator)._
@@ -210,4 +211,7 @@ A use case for round tripping is when a user wants to update a value on one or m
 Looking at the CSV, you'll notice that the numerated headers are used. This is the default. A singular heading can be used if the mapping is updated to specifically require it.
 
 For the moment, we don't need to change any values on the CSV. We can simply import the zip that was just exported. Afterwards, we should see no duplicates.
+## Bonus Material
 
+creating a custom work_identifier (needing to add it to the work too)
+nested attributes
