@@ -7,6 +7,14 @@ if ENV.fetch('HYKU_BULKRAX_ENABLED', 'true') == 'true'
     #   { name: 'MODS - My Local MODS parser', class_name: 'Bulkrax::ModsXmlParser', partial: 'mods_fields' },
     # ]
 
+    # Remove local parsers
+    config.parsers -= [
+      { name: "OAI - Dublin Core", class_name: "Bulkrax::OaiDcParser", partial: "oai_fields" },
+      { name: "OAI - Qualified Dublin Core", class_name: "Bulkrax::OaiQualifiedDcParser", partial: "oai_fields" },
+      { name: "Bagit", class_name: "Bulkrax::BagitParser", partial: "bagit_fields" },
+      { name: "XML", class_name: "Bulkrax::XmlParser", partial: "xml_fields" }
+    ]
+
     # Field to use during import to identify if the Work or Collection already exists.
     # Default is 'source'.
     # config.system_identifier_field = 'source'
@@ -55,7 +63,9 @@ if ENV.fetch('HYKU_BULKRAX_ENABLED', 'true') == 'true'
 
     default_field_mapping = {
       'parents' => { from: ['parents'], related_parents_field_mapping: true },
-      'children' => { from: ['children'], related_children_field_mapping: true }
+      'children' => { from: ['children'], related_children_field_mapping: true },
+      'source' => { from: ['source_identifier'], source_identifier: true },
+      'title' => { from: ['title'] }
     }
 
     config.field_mappings["Bulkrax::BagitParser"] = default_field_mapping.merge({
