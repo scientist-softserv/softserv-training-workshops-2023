@@ -206,12 +206,8 @@ Open the downloaded file and observe your data!
 
 ### [7] Round Trip
 A use case for round tripping is when a user wants to update a value on one or more works that already exist in the tenant. In that case, the user would create an export with the appropriate settings, update the value(s), then import that CSV.
-> _NOTE: It is crucial that the values underneath the attribute representing the  `source_identifier` are NOT changed. That value, along with the `id` of the item, is how bulkrax determines uniqueness. If you change either, duplicates will be made and/or errors will occur._
+> _NOTE: It is crucial that the values underneath the attribute representing the `source_identifier` are NOT changed. That value, along with the `id` of the item, is how bulkrax determines uniqueness. If you change either, duplicates will be made and/or errors will occur._
 
 Looking at the CSV, you'll notice that the numerated headers are used. This is the default. A singular heading can be used if the mapping is updated to specifically require it.
 
 For the moment, we don't need to change any values on the CSV. We can simply import the zip that was just exported. Afterwards, we should see no duplicates.
-## Bonus Material
-
-creating a custom work_identifier (needing to add it to the work too)
-nested attributes
