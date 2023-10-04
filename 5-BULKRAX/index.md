@@ -20,6 +20,7 @@ Here you'll find the workshop's concepts and exercises that are meant to go alon
   - [[3] Import Required Fields Only](#3-import-required-fields-only)
   - [[4] Import Fields Without Custom Mapping](#4-import-fields-without-custom-mapping)
   - [[5] Import a Comples CSV](#5-import-fields-with-custom-mapping)
+  - [[6] Export](#6-export)
 ---
 
 ## Setup Instructions
@@ -58,6 +59,10 @@ Visit `hyku.test/proprietor/accounts?locale=en`. Click "Create new account" to e
 - [Field Mappings](https://github.com/samvera-labs/bulkrax/wiki/Configuring-Bulkrax#field-mappings)
 - [Work identifier](https://github.com/samvera-labs/bulkrax/wiki/Configuring-Bulkrax#work-identifier)
 - [Source identifier](https://github.com/samvera-labs/bulkrax/wiki/Configuring-Bulkrax#source-identifier)
+- [Parent/Child Relationships](https://github.com/samvera-labs/bulkrax/wiki/Configuring-Bulkrax#parent-child-relationship-field-mappings)
+- [Exporting](https://github.com/samvera-labs/bulkrax/wiki/CSV-Exporter#exporting)
+- [Round Tripping](https://github.com/samvera-labs/bulkrax/wiki/CSV-Exporter#round-tripping)
+- [Troubleshooting](https://github.com/samvera-labs/bulkrax/wiki/Troubleshooting)
 
 ## Background Jobs
 > "One of the many powerful features of Rails is its support for background jobs, which allow you to run specific tasks asynchronously in the background without blocking the main thread of execution.
@@ -171,4 +176,19 @@ In the CSV inside of that zip file, you'll see 3 rows. Therefore, we'll be makin
   - ref: https://github.com/samvera-labs/bulkrax/wiki/CSV-Importer#files-location
 
 Let's import the zip file now!
+
+### [6] Export
+Visit the "/exporters" endpoint and click "New".
+- Name: whatever you'd like
+- Type of Export: Metadata and Files
+- Export From: All
+- Export Format: CSV
+
+Press "Create and Export".
+
+The above options will export the metadata and files for every Collection, Work and FileSet in the current tenant in CSV format. For the amount of works we have, it shouldn't take long. Once completed, refresh the page and you should see a dropdown underneath the "Downloadable Files" header on the Exporters index page.
+
+If there were over 1000 items exported, there would be multiple CSV's as they split at 1000 by default. In this case, there should only be one zip file. Press the "Download" button next to the name of your zip and it will download to your computer.
+
+Open the downloaded file and observe your data!
 
