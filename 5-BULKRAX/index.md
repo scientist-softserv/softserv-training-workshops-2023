@@ -8,7 +8,7 @@ Welcome!
 
 Bulkrax is a batteries included importer for Samvera applications. It currently includes support for OAI-PMH (DC and Qualified DC) and CSV out of the box. It is also designed to be extensible, allowing you to easily add new importers in to your application or to include them with other gems. Bulkrax provides a full admin interface including creating, editing, scheduling and reviewing imports.
 
-Here you'll find the workshop's concepts and exercises that are meant to go along with the commits on this branch. As you work through the exercises, you can reference the related commit(s) to check your progress. **YOU WILL NOT NEED TO CHECK OUT THIS BRANCH.**
+Here you'll find the workshop's concepts and exercises that are meant to go along with the commits on this branch. As you work through the exercises, you can reference the related commit(s) to check your progress. **DO NOT CHECK OUT THIS BRANCH UNLESS YOU ARE READY TO SEE THE END RESULT.**
 
 **CONTENTS**
 - [Setup Instructions](#setup-instructions)
@@ -35,7 +35,7 @@ git checkout main
 git checkout -b branch-name
 ```
 
-_NOTE: Either way, please pull `main` again as there have been some updates._
+_NOTE: Either way, please pull `main` again as there may have been some updates._
 
 ### Running the Stack
 If you're unfamiliar with the Hyku application, please refer to the "HYKU README" section at the bottom of the [README](../README.md) to get it running.
@@ -76,7 +76,7 @@ Hyku uses Sidekiq as its background job processor and is already installed.
 
 ## Exercises
 ### [1] Install bulkrax
-Today we will be working from the latest released version, [v5.4.1](https://github.com/samvera-labs/bulkrax/releases/tag/v5.4.0)
+Today we will be working from the latest released version, [v5.4.1](https://github.com/samvera-labs/bulkrax/releases/tag/v5.4.1)
 
 ``` bash
 # Update the Bulkrax version in the Gemfile
