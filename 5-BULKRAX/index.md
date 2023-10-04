@@ -16,9 +16,10 @@ Here you'll find the workshop's concepts and exercises that are meant to go alon
 - [Background Jobs](#background-jobs)
 - [Exercises](#exercises)
   - [[1] Install Bulkrax](#1-install-bulkrax)
-  - [[2] Remove non CSV parsers](#2-remove-non-csv-parsers)
-  - [[3] Import required fields only](#3-import-required-fields-only)
-  - [[4] Import fields without custom mapping](#4-import-fields-without-custom-mapping)
+  - [[2] Remove non CSV Parsers](#2-remove-non-csv-parsers)
+  - [[3] Import Required Fields Only](#3-import-required-fields-only)
+  - [[4] Import Fields Without Custom Mapping](#4-import-fields-without-custom-mapping)
+  - [[5] Import a Comples CSV](#5-import-fields-with-custom-mapping)
 ---
 
 ## Setup Instructions
@@ -31,6 +32,8 @@ git clone https://github.com/scientist-softserv/softserv-training-workshops-2023
 git checkout main
 git checkout -b branch-name
 ```
+
+_NOTE: Either way, please pull `main` again as there have been some updates._
 
 ### Running the Stack
 If you're unfamiliar with the Hyku application, please refer to the "HYKU README" section at the bottom of the [README](../README.md) to get it running.
@@ -79,7 +82,7 @@ bundle install
 ```
 - _NOTE: since bulkrax is already in hyku, we do not have to run the generate or migrate commands found in the [bulkrax readme](https://github.com/samvera-labs/bulkrax#install-generator)._
 
-### [2] Remove non CSV parsers
+### [2] Remove non CSV Parsers
 By default, bulkrax comes installed with 5 parsers. They are listed in the bulkrax config file (["lib/bulkrax.rb"](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L104-L111)). A similar config file exists in your app at [config/initializers/bulkrax.rb](../config/initializers/bulkrax.rb). Visit the "/importers" endpoint and click the dropdown underneath the `Parser` heading. Here we'll see the 5 parser's listed.
 
 However, for the purposes of this workshop, we'll only be dealing with the CSV parser, so we will remove the others. In "config/initializers/bulkrax.rb" add the code below underneath the commented out "add local parsers" section.
@@ -110,7 +113,7 @@ docker compose up web
 
 Refresh the page now and only the "CSV" parser should show as an option.
 
-### [3] Import required fields only
+### [3] Import Required Fields Only
 Looking back at bulkrax's config file, we see that some parsers already include a few field mappings. The `Bulkrax::CsvParser` is not one of them. However, Hyku resets all parsers to only have the same 2 field mappings by default: `parents` and `children`. We can then build upon that mapping for each parser as we see fit.
 
 To begin with, we will import a CSV with only the required elements. Hyku requires the [title](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L118) field. Bulkrax requires the [source_identifier]((https://github.com/samvera-labs/bulkrax/blob/main/app/parsers/bulkrax/application_parser.rb#L279-L291)) field. `source_identifier` can be added on the imported file, or we can configure bulkrax to create one on import. For now, we will add it to our CSV. I have created sample CSV's for your use during this workshop in ["5-BULKRAX/fixtures"](./fixtures/). The CSV for this exercise can be found [here](./fixtures/required-fields-only.csv) if you would like to save it. Otherwise, you can create your own.
@@ -126,18 +129,46 @@ docker compose exec web sh
 sidekiq
 ```
 
-Once the `ImportWorkJob` completes, there will still be the `ScheduledRelationshipsJob`. We can enqueue it automatically since we know the work has been created. Now, go back to the Importers index page and refresh. You ought to have an importer with a status of "Completed". Click on the name of your importer and see your successfully created work entry! :tada:
-
-Go to the works index page and see your newly imported work!
-> _NOTE: we cannot view the work from the entry show page at the moment. The bug has been logged [here](https://github.com/samvera-labs/bulkrax/issues/866)._
+Once the `ImportWorkJob` completes, there will still be the `ScheduledRelationshipsJob`. We can enqueue it automatically since we know the work has been created. Now, go back to the Importers index page and refresh. You ought to have an importer with a status of "Completed". Click on the name of your importer and see your successfully created work entry. :tada:
+From there you can click on the link to your newly created work!
 
 How was a work created if we only listed a title and source_identifier on the CSV?
 Excellent question! In your app bulkrax config file there's a `config.default_work_type` property. By default, it's set to `Hyrax.config.curation_concerns.first`. We have not updated that value, therefore our imported data was created as a GenericWork.
 
-### [4] Import fields without custom mapping
+### [4] Import Fields Without Custom Mapping
 In addition to the required fields, we are able to import a file that has other column names. Without adding any further custom mapping, Bulkrax will automatically handle column names that are the same as the attribute found on the work type. e.g., the GenericWork work type has an attribute called `creator`, so the value in a column named `creator` will map to it with no additional setup needed.
 
 This works because bulkrax will use the [default_field_mapping](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L187-L200) in order to correctly assign the imported data as the attributes on the appropriate Work.
 
 Sample CSV [here](./fixtures/no-custom-mapping.csv)
+
+### [5] Import a Complex CSV
+Now we'll import a CSV that needs to form relationships, add a file and have custom bulkrax mappings. To begin with, let's add the following to the `Bulkrax::CsvParser` mappings in our app bulkrax config file.
+
+``` ruby
+'creator' => { from: ['creator'], split: '\|' },
+'description' => { from: ['profile'] }
+```
+The first line says if there is a pipe ("|") character in the values underneath the "creator" column, split the value at that character. e.g., there are multiple creators.
+  - We must escape the pipe so that the value only gets split on the pipe, and not split on every character. Ref: [this code](https://github.com/samvera-labs/bulkrax/blob/main/app/matchers/bulkrax/application_matcher.rb#L36-L43).
+  - Another way to have multiple creators would be to use the "_#" syntax. e.g. "creator_1" and "creator_2" could be the column header names.
+The second line tells bulkrax that if it encounters a column heading of "profile" on a CSV, that it should be linked to the "description" attribute on the work.
+> _NOTE: I prefer to explicitly set all mappings for a given parser_
+
+Restart the server using your preferred method.
+
+Sample zip [here](./fixtures/complex-csv.zip).
+
+In the CSV inside of that zip file, you'll see 3 rows. Therefore, we'll be making 3 new models. We also have 3 new column headings:
+- `model`: this specifies which work type each row should wind up being
+- `parents`: this is one way to establish relationships between two or more models:
+  - Collection:Collection
+  - Work:Work
+  - Collection:Work
+  - Work:Fileset
+- `file`: the name of the file that should be attached to this model
+  - In order for this to work, there must be a file with this name inside of the "files" folder that is a sibling to the csv referencing it.
+  - ref: https://github.com/samvera-labs/bulkrax/wiki/CSV-Importer#files-location
+
+Let's import the zip file now!
 

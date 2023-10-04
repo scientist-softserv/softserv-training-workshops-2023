@@ -62,8 +62,9 @@ if ENV.fetch('HYKU_BULKRAX_ENABLED', 'true') == 'true'
     #   config.field_mappings["Bulkrax::OaiDcParser"]["date"] = { from: ["date"], excluded: true  }
 
     default_field_mapping = {
+      'children' => { from: ['children'], related_children_field_mapping: true },
       'parents' => { from: ['parents'], related_parents_field_mapping: true },
-      'children' => { from: ['children'], related_children_field_mapping: true }
+      'source' => { from: ['source_identifier'], source_identifier: true },
     }
 
     config.field_mappings["Bulkrax::BagitParser"] = default_field_mapping.merge({
@@ -71,7 +72,8 @@ if ENV.fetch('HYKU_BULKRAX_ENABLED', 'true') == 'true'
     })
 
     config.field_mappings["Bulkrax::CsvParser"] = default_field_mapping.merge({
-      # add or remove custom mappings for this parser here
+      'creator' => { from: ['creator'], split: '\|' },
+      'description' => { from: ['profile'] }
     })
 
     config.field_mappings["Bulkrax::OaiDcParser"] = default_field_mapping.merge({
