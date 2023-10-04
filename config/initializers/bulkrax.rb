@@ -73,7 +73,8 @@ if ENV.fetch('HYKU_BULKRAX_ENABLED', 'true') == 'true'
     })
 
     config.field_mappings["Bulkrax::CsvParser"] = default_field_mapping.merge({
-      # add or remove custom mappings for this parser here
+      'creator' => { from: ['creator'], split: '\|' },
+      'description' => { from: ['profile'] }
     })
 
     config.field_mappings["Bulkrax::OaiDcParser"] = default_field_mapping.merge({
