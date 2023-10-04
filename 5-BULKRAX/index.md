@@ -21,6 +21,7 @@ Here you'll find the workshop's concepts and exercises that are meant to go alon
   - [[4] Import Fields Without Custom Mapping](#4-import-fields-without-custom-mapping)
   - [[5] Import a Comples CSV](#5-import-fields-with-custom-mapping)
   - [[6] Export](#6-export)
+  - [[7] Round Trip](#7-round-trip)
 ---
 
 ## Setup Instructions
@@ -85,7 +86,7 @@ gem 'bulkrax', '5.4.1'
 # Update bulkrax
 bundle install
 ```
-- _NOTE: since bulkrax is already in hyku, we do not have to run the generate or migrate commands found in the [bulkrax readme](https://github.com/samvera-labs/bulkrax#install-generator)._
+> _NOTE: since bulkrax is already in hyku, we do not have to run the generate or migrate commands found in the [bulkrax readme](https://github.com/samvera-labs/bulkrax#install-generator)._
 
 ### [2] Remove non CSV Parsers
 By default, bulkrax comes installed with 5 parsers. They are listed in the bulkrax config file (["lib/bulkrax.rb"](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L104-L111)). A similar config file exists in your app at [config/initializers/bulkrax.rb](../config/initializers/bulkrax.rb). Visit the "/importers" endpoint and click the dropdown underneath the `Parser` heading. Here we'll see the 5 parser's listed.
@@ -121,7 +122,16 @@ Refresh the page now and only the "CSV" parser should show as an option.
 ### [3] Import Required Fields Only
 Looking back at bulkrax's config file, we see that some parsers already include a few field mappings. The `Bulkrax::CsvParser` is not one of them. However, Hyku resets all parsers to only have the same 2 field mappings by default: `parents` and `children`. We can then build upon that mapping for each parser as we see fit.
 
-To begin with, we will import a CSV with only the required elements. Hyku requires the [title](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L118) field. Bulkrax requires the [source_identifier]((https://github.com/samvera-labs/bulkrax/blob/main/app/parsers/bulkrax/application_parser.rb#L279-L291)) field. `source_identifier` can be added on the imported file, or we can configure bulkrax to create one on import. For now, we will add it to our CSV. I have created sample CSV's for your use during this workshop in ["5-BULKRAX/fixtures"](./fixtures/). The CSV for this exercise can be found [here](./fixtures/required-fields-only.csv) if you would like to save it. Otherwise, you can create your own.
+To begin with, we will import a CSV with only the required elements. Hyku requires the [title](https://github.com/samvera-labs/bulkrax/blob/main/lib/bulkrax.rb#L118) field. Bulkrax requires the [source_identifier]((https://github.com/samvera-labs/bulkrax/blob/main/app/parsers/bulkrax/application_parser.rb#L279-L291)) field. The attribute representing the `source_identifier` can be added on the imported file, or we can configure bulkrax to create one on import. For now, we will add it to our CSV. I have created sample CSV's for your use during this workshop in ["5-BULKRAX/fixtures"](./fixtures/). The CSV for this exercise can be found [here](./fixtures/required-fields-only.csv) if you would like to save it. Otherwise, you can create your own.
+>_NOTE: although the `source_identifier` column heading will map to the `source` attribute on the model by default, we must now explicitly state our intended `source_identifier` value. Otherwise, Bulkrax will not respect the `source` attribute as unique._
+
+Update the `default_field_mapping` object in the app config file to include the following, then restart the server:
+
+```ruby
+'source' => { from: ['source_identifier'], source_identifier: true },
+'title' => { from: ['title'] }
+```
+> _NOTE: I prefer to explicitly set all mappings for a given parser to cover all bases._
 
 At the "/importers" endpoint, give your importer a name, select the Administrative Set and choose the Parser type of CSV. Once a parser type is selected, the additional applicable fields will show up. In our case, we only need to be concerned with uploading our CSV. Click the "Upload a File" radio button and then browse to find and select your file.
 
@@ -158,7 +168,6 @@ The first line says if there is a pipe ("|") character in the values underneath 
   - We must escape the pipe so that the value only gets split on the pipe, and not split on every character. Ref: [this code](https://github.com/samvera-labs/bulkrax/blob/main/app/matchers/bulkrax/application_matcher.rb#L36-L43).
   - Another way to have multiple creators would be to use the "_#" syntax. e.g. "creator_1" and "creator_2" could be the column header names.
 The second line tells bulkrax that if it encounters a column heading of "profile" on a CSV, that it should be linked to the "description" attribute on the work.
-> _NOTE: I prefer to explicitly set all mappings for a given parser_
 
 Restart the server using your preferred method.
 
@@ -186,9 +195,19 @@ Visit the "/exporters" endpoint and click "New".
 
 Press "Create and Export".
 
-The above options will export the metadata and files for every Collection, Work and FileSet in the current tenant in CSV format. For the amount of works we have, it shouldn't take long. Once completed, refresh the page and you should see a dropdown underneath the "Downloadable Files" header on the Exporters index page.
+The above options will export the metadata and files for every Collection, Work and FileSet in the current tenant in CSV format. It will use the mappings in the app bulkrax config file to create the column headers. If you do not have a mapping for a particular field, you run the risk of it not exporting.
+
+For the amount of works we have, the export shouldn't take long. Once completed, refresh the page and you should see a dropdown underneath the "Downloadable Files" header on the Exporters index page.
 
 If there were over 1000 items exported, there would be multiple CSV's as they split at 1000 by default. In this case, there should only be one zip file. Press the "Download" button next to the name of your zip and it will download to your computer.
 
 Open the downloaded file and observe your data!
+
+### [7] Round Trip
+A use case for round tripping is when a user wants to update a value on one or more works that already exist in the tenant. In that case, the user would create an export with the appropriate settings, update the value(s), then import that CSV.
+> _NOTE: It is crucial that the values underneath the attribute representing the  `source_identifier` are NOT changed. That value, along with the `id` of the item, is how bulkrax determines uniqueness. If you change either, duplicates will be made and/or errors will occur._
+
+Looking at the CSV, you'll notice that the numerated headers are used. This is the default. A singular heading can be used if the mapping is updated to specifically require it.
+
+For the moment, we don't need to change any values on the CSV. We can simply import the zip that was just exported. Afterwards, we should see no duplicates.
 

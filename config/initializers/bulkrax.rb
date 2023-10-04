@@ -65,6 +65,7 @@ if ENV.fetch('HYKU_BULKRAX_ENABLED', 'true') == 'true'
       'children' => { from: ['children'], related_children_field_mapping: true },
       'parents' => { from: ['parents'], related_parents_field_mapping: true },
       'source' => { from: ['source_identifier'], source_identifier: true },
+      'title' => { from: ['title'] }
     }
 
     config.field_mappings["Bulkrax::BagitParser"] = default_field_mapping.merge({
