@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.5'
+plugin 'bootboot', '~> 0.2.1'
 
 gem 'activerecord-nulldb-adapter'
 gem 'addressable', '2.8.1' # remove once https://github.com/postrank-labs/postrank-uri/issues/49 is fixed
@@ -11,8 +9,6 @@ gem 'addressable', '2.8.1' # remove once https://github.com/postrank-labs/postra
 gem 'pg'
 # Use Puma as the app server
 gem 'puma', '~> 4.3'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # See https://github.com/rails/execjs#readme for more supported runtimes
@@ -87,15 +83,6 @@ end
 
 gem 'bulkrax', '~> 5.0'
 
-gem 'blacklight', '~> 6.7'
-gem 'blacklight_oai_provider', '~> 6.1', '>= 6.1.1'
-
-gem 'hyrax', '~> 3.5.0'
-
-gem 'bolognese', '>= 1.9.10'
-gem 'hyrax-doi', git: 'https://github.com/samvera-labs/hyrax-doi.git', branch: 'main'
-gem 'hyrax-iiif_av', git: 'https://github.com/samvera-labs/hyrax-iiif_av.git', branch: 'main'
-gem 'iiif_print', git: 'https://github.com/scientist-softserv/iiif_print.git', branch: 'main'
 gem 'postrank-uri', '>= 1.0.24'
 gem 'redlock', '>= 0.1.2', '< 2.0' # lock redlock per https://github.com/samvera/hyrax/pull/5961
 gem 'rsolr', '~> 2.0'
@@ -130,15 +117,37 @@ gem 'codemirror-rails'
 gem 'negative_captcha'
 gem 'okcomputer'
 gem 'parser', '~> 2.5.3'
-gem 'rdf', '~> 3.1.15' # rdf 3.2.0 removed SerializedTransaction which ldp requires
-gem 'riiif', '~> 1.1'
 gem 'secure_headers'
 gem 'sidekiq', "< 7.0" # sidekiq 7 requires upgrade to redis 6
 gem 'terser' # to support the Safe Navigation / Optional Chaining operator (?.) and avoid uglifier precompile issue
 gem 'tether-rails'
 
-# When first attempting to upgrade to Hyrax v3.4.2, this dry-monads gem was upgraded to v1.5.0.
-# This version threw the following error:
-# NameError: uninitialized constant Dry::Monads::Result::Transformer
-# Locking it to v1.4.x does not throw an error.
-gem 'dry-monads', '~> 1.4.0'
+Plugin.send(:load_plugin, 'bootboot') if Plugin.installed?('bootboot')
+
+if ENV['DEPENDENCIES_NEXT']
+  enable_dual_booting if Plugin.installed?('bootboot')
+  gem 'rails'
+  gem 'hyrax', '~> 4.0.0'
+  gem 'iiif_print', git: 'https://github.com/scientist-softserv/iiif_print.git', branch: 'rails_version'
+  gem 'hyrax-iiif_av', git: 'https://github.com/samvera-labs/hyrax-iiif_av.git', branch: 'rails_hyrax_upgrade'
+  gem 'hyrax-doi', git: 'https://github.com/samvera-labs/hyrax-doi.git', branch: 'rails_hyrax_upgrade'
+  gem 'blacklight'
+  gem 'blacklight_oai_provider'
+  gem 'rdf'
+  gem 'sass-rails', '~> 6.0'
+  gem 'riiif'
+  gem 'bolognese', git: 'https://github.com/orangewolf/bolognese.git', branch: 'patch-1'
+  gem 'maremma', git: 'https://github.com/orangewolf/maremma.git', branch: 'patch-1'
+else
+  gem 'rails', '~> 5.2.5'
+  gem 'hyrax', '~> 3.5.0'
+  gem 'iiif_print', git: 'https://github.com/scientist-softserv/iiif_print.git', branch: 'main'
+  gem 'hyrax-iiif_av', git: 'https://github.com/samvera-labs/hyrax-iiif_av.git', branch: 'main'
+  gem 'hyrax-doi', git: 'https://github.com/samvera-labs/hyrax-doi.git', branch: 'main'
+  gem 'blacklight', '~> 6.7'
+  gem 'blacklight_oai_provider', '~> 6.1', '>= 6.1.1'
+  gem 'rdf', '~> 3.1.15' # rdf 3.2.0 removed SerializedTransaction which ldp requires
+  gem 'sass-rails', '~> 5.0'
+  gem 'riiif', '~> 1.1'
+  gem 'bolognese', '>= 1.9.10'
+end
