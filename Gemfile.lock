@@ -225,6 +225,7 @@ GEM
     bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
       sassc (>= 2.0.0)
+    brakeman (5.4.1)
     breadcrumbs_on_rails (3.0.1)
     browse-everything (1.2.0)
       addressable (~> 2.5)
@@ -1223,6 +1224,7 @@ DEPENDENCIES
   blacklight_oai_provider (~> 6.1, >= 6.1.1)
   bolognese (>= 1.9.10)
   bootstrap-datepicker-rails
+  brakeman
   bulkrax (~> 5.0)
   byebug
   capybara
