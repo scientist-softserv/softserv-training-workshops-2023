@@ -3,6 +3,7 @@
 # OVERRIDE: Hyrax 3.4.0 to add inject_show_theme_views - Hyku theming and correct hostname of manifests
 # OVERRIDE: Hyrax 3.4.0 to add Hyrax IIIF AV
 require 'iiif_manifest'
+require "hyrax/doi/errors"
 
 # rubocop:disable Metrics/ModuleLength
 # rubocop:disable Metrics/LineLength
@@ -61,6 +62,7 @@ module Hyrax
     end
 
     def new
+      set_doi_data if params['doi'].present?
       @admin_set_options = available_admin_sets
       # TODO: move these lines to the work form builder in Hyrax
       curation_concern.depositor = current_user.user_key
@@ -100,6 +102,7 @@ module Hyrax
     # rubocop:enable Metrics/AbcSize
 
     def edit
+      set_doi_data if params['doi'].present?
       @admin_set_options = available_admin_sets
       build_form
     end
@@ -514,7 +517,73 @@ module Hyrax
           # rubocop:enable Lint/UselessAssignment, Layout/SpaceAroundOperators, Style/RedundantParentheses
         else
           yield
+        end      
+      end
+
+      def set_doi_data
+        return if params["doi"].blank?
+        begin
+          @work_attributes = hyrax_work_from_doi(params["doi"])
+          curation_concern.attributes = @work_attributes
+          flash_keys = @work_attributes.reject { |_k, v| v.blank? }.keys.map { |k| t("simple_form.labels.defaults.#{k}", default: k.humanize) }.uniq
+          flash[:notice] = ["The following fields were auto-populated:", flash_keys.to_sentence]
+        rescue StandardError => e
+          Rails.logger.info(e.message)
+          raise if Rails.env.development?
+          raise Hyrax::DOI::NotFoundError
         end
+      end
+
+      def hyrax_work_from_doi(doi)
+        # TODO: generalize this
+        meta = Bolognese::Metadata.new(input: doi,
+                                       from: "datacite",
+                                       sandbox: false)
+         if meta.blank? || meta.doi.blank? || meta.state == "not_found"
+          meta = Bolognese::Metadata.new(input: doi,
+                                         from: "crossref",
+                                         sandbox: false)
+        end
+        if meta.blank? || meta.doi.blank? || meta.state == "not_found"
+          meta = Bolognese::Metadata.new(input: doi,
+                                         from: "datacite",
+                                         sandbox: true)
+        end
+        # Check that a record was actually loaded
+        raise Hyrax::DOI::NotFoundError, "DOI (#{doi}) could not be found." if meta.blank? || meta.doi.blank?
+        meta.types["hyrax"] = curation_concern.class.to_s
+        meta.hyrax_work
+      end
+
+      def set_doi_data
+        return if params["doi"].blank?
+
+        begin
+          @work_attributes = hyrax_work_from_doi(params["doi"])
+          curation_concern.attributes = @work_attributes
+          flash_keys = @work_attributes.reject { |_k, v| v.blank? }.keys.map { |k| t("simple_form.labels.defaults.#{k}", default: k.humanize) }.uniq
+          flash[:notice] = ["The following fields were auto-populated:", flash_keys.to_sentence]
+        rescue StandardError => e
+          Rails.logger.info(e.message)
+          raise if Rails.env.development?
+          raise Hyrax::DOI::NotFoundError
+        end
+      end
+
+      def hyrax_work_from_doi(doi)
+        # TODO: generalize this
+        meta = Bolognese::Metadata.new(input: doi,
+                                       from: "datacite",
+                                       sandbox: false)
+        if meta.blank? || meta.doi.blank? || meta.state == "not_found"
+          meta = Bolognese::Metadata.new(input: doi,
+                                         from: "datacite",
+                                         sandbox: true)
+        end
+        # Check that a record was actually loaded
+        raise Hyrax::DOI::NotFoundError, "DOI (#{doi}) could not be found." if meta.blank? || meta.doi.blank?
+        meta.types["hyrax"] = curation_concern.class.to_s
+        meta.hyrax_work
       end
   end
 end

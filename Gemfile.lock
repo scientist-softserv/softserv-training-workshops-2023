@@ -9,8 +9,8 @@ GIT
 
 GIT
   remote: https://github.com/samvera-labs/hyrax-doi.git
-  revision: d494a50ef8ce3eae594c7ed7148c33b3c977d4a7
-  branch: main
+  revision: df260ad8e3811d595c2b45f030d4eb6be1860df8
+  branch: backport-british-library-optimizations
   specs:
     hyrax-doi (0.2.0)
       bolognese (~> 1.8, >= 1.8.6)

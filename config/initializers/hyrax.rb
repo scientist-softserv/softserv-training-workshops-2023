@@ -188,6 +188,9 @@ Hyrax.config do |config|
     # See Samvera Slack thread https://samvera.slack.com/archives/C0F9JQJDQ/p1596718417351200?thread_ts=1596717896.350700&cid=C0F9JQJDQ
     uri.sub(/\Ahttp:/, 'https:')
   end
+
+  ## DOI actor insertion
+  Hyrax::CurationConcern.actor_factory.insert_after(Hyrax::Actors::ModelActor, Hyrax::Actors::DOIActor)
 end
 
 Date::DATE_FORMATS[:standard] = "%m/%d/%Y"
