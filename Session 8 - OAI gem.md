@@ -75,7 +75,7 @@ The default url for OAI requests in Hyku is `{tenant url}/catalog/oai?` followed
 
 - The number of items returned for a request can be modified in `catalog_controller.rb`
 - New sets can be defined in `catalog_controller.rb` for any facetable terms. The pre-set configuration only defines sets for Admin Sets.
-- Term mappings for the `oai_dc` metadataPrefix can be customized in `solr_document.rb`. Available terms for oai_dc are: `contributor`, `coverage`, `creator`, `date`, `description`, `format`, `identifier`, `language`, `publisher`, `relation`, `rights`, `source`, `subject`, `title`, `type`
+- Term mappings for the `oai_dc` metadataPrefix can be customized in `solr_document.rb`. Available terms for oai_dc are: `contributor`, `coverage`, `creator`, `date`, `description`, `format`, `identifier`, `language`, `publisher`, `relation`, `rights`, `source`, `subject`, `title`, `type`. You can map multiple solr fields to a single term by putting the mapped terms into an array: `rights: ['rights_statement_tesim', 'license_tesim', 'rights_notes_tesim', 'access_right_tesim']` (Commit `e69f16d` implements this.)
 - The repository name used in the `catalog_controller` config is the tenant's name. 
 - The `record prefix`, `admin email`, and `sample id` values used in the `catalog_controller` config can be configured individually by tenant in either the app's superadmin dashboard or on the tenant's admin dashboard.
 - Hyku implements two metadataPrefixes (oai_dc and oai_hyku): `oai_dc` implements only the standard dc terms, and `oai_hyku` contains extended terms to map as desired.
@@ -85,7 +85,7 @@ Implementing a new metadataPrefix requires several oai gem overrides & customiza
 
 - Add `lib/oai/provider/metadata_format/xxxxxx.rb`, where `xxxxxx` is the new format being defined. Normally in `initialize` the array of terms is set as `@fields =`.
 - Add (or update) `lib/oai/provider/model_decorator.rb` to define `map_xxxxxx`, the mapping from Hyku terms to the terms specified in @fields, for the new metadataPrefix.
-- Update `application.rb` to require & load the new oai files:
+- Update `application.rb` if necessary to require & load the new oai files:
 ```
 # OAI additions
 Dir.glob(File.join(File.dirname(__FILE__), "../lib/oai/**/*.rb")).sort.each do |c|
@@ -106,7 +106,8 @@ def encode(model, record)
   record.to_oai_mods
 end
 ```
-- Add `app/model/concerns/mods_solr_document.rb` which defines `to_oai_mods` and returns the mods xml document for the object.
+- Add `app/model/concerns/mods_solr_document.rb` which defines `to_oai_mods` and returns the mods xml document for the object. 
+- Add `include ModsSolrDocument` to your SolrDocument.
 
 ## OAI Exercises
 1. Access your oai_dc feed using `{tenant url}/catalog/oai?verb=Identify`
@@ -127,47 +128,146 @@ end
 6. Bonus: Implement a new MODS metadata format
    - See [Implementing a mods metadataPrefix](#implementing-a-mods-metadataprefix)
 
-### Exercise Solutions
+### Exercise Details & Solutions
 
 <details>
 <summary>Exercise 1</summary>
  
- (coming soon)
+- Go to a tenant on your site, and add `/catalog/oai?verb=Identify`. You can then click options to browse all of the various verbs, different metadata formats, and view data in your repository.
+- Right-click and select `view page source` to see your data as XML rather than via the XSLT view.
+- To use a resumption token, you need enough data in your repository to produce a second page. Go to `/catalog/oai?verb=ListRecords&metadataPrefix=oai_dc` and you should see `There are more results.` followed by the resumption token. Click resume, or add `&resumptionToken={token}` to your URL. If you don't have enough data for a second page, you can try again after changing the page size Exercise 2.
 
 </details>
 
 <details>
 <summary>Exercise 2</summary>
  
- (coming soon)
+Several options (oai:hyku prefix, admin email, and sample id) can be configured via the admin configuration for the tenant. These are actually configured in the catalog_controller in the `config.oai` section, which pulls the values from the admin configuration. 
+
+Page size is configured directly in the catalog controller. Here you can change your page size to a lower value and check out the resumption token.
+
+```
+  # OAI Config fields
+  config.oai = {
+    provider: {
+      repository_name: ->(controller) { controller.send(:current_account)&.name.presence },
+      # repository_url:  ->(controller) { controller.oai_catalog_url },
+      record_prefix: ->(controller) { controller.send(:current_account).oai_prefix },
+      admin_email:   ->(controller) { controller.send(:current_account).oai_admin_email },
+      sample_id:     ->(controller) { controller.send(:current_account).oai_sample_identifier }
+    },
+    document: {
+      limit: 100, # number of records returned with each request, default: 15
+      set_fields: [ # ability to define ListSets, optional, default: nil
+        { label: 'collection', solr_field: 'isPartOf_ssim' }
+      ]
+    }
+  }
+```
+
+See commit `2416bd3` for code.
 
 </details>
 
 <details>
 <summary>Exercise 3</summary>
  
- (coming soon)
+The `oai_hyku` metadata format is a dublin core mapping format, allowing you to customize it with your choice of metadata. By default, it is set up for terms: `abstract`, `access_right`, `alternative_title`, `based_near`, `bibliographic_citation`, `contributor`, `creator`, `date_created`, `date_modified`, `date_uploaded`, `depositor`, `description`, `identifier`, `keyword language`, `license`, `owner`, `publisher`, `related_url`, `resource_type`, `rights_notes`, `rights_statement`, `source`, `subject`, and `title`.
+
+A common request is to add the thumbnail url to the feed. This can be done similarly to the way the public file url was added to the XML. Modify `lib/oai/provider/metadata_format/hyku_dublin_core.rb` to add method `def add_thumbnail`, which builds the thumbnail_url, and generates the xml to add to the xml document in method `encode`. 
+
+Other solr terms can also be added to the output by adding them into the `@fields` array, and then mapping to the corresponding solr term in `lib/oai/provider/model_decorator.rb`.
+
+To see the results, you will need to restart your server.
+
+See commit `56e5a7a` for code.
 
 </details>
 
 <details>
 <summary>Exercise 4</summary>
 
- (coming soon)
+Out-of-the-box Hyku comes with only Admin Sets defined as sets. Collections are a much more useful set configuration, but you may also want to add other custom sets. Any term which is indexed as faceted can easily be configured as a set.
+
+Previously you modified the page size. Sets are configured in the same config block. You will add a new hash to define your chosen set, in the format `{ label: 'xxxx', solr_field: 'xxxx' }`. You may keep, rename, or remove the AdminSet defined OAI set.
+
+See commit `4813edf` for code.
 
 </details>
 
 <details>
 <summary>Exercise 5</summary>
 
- (coming soon)
+Adding a new XML metadata format is simply a matter of following the structure described in the [Adding a new metadata format section](#adding-a-new-metadata-format), and mimicking what was done for oai_hyku.
+
+See commit `269a907` for code implementing a new metadata format `oai_training`.
 
 </details>
 
 <details>
 <summary>Exercise 6</summary>
 
- (coming soon)
+For details on setting up the `to_oai_mods` structure in your ModsSolrDocument module, see [the MODS schema outline](https://www.loc.gov/standards/mods/mods-outline-3-5.html).
+
+Customizing the field mappings in `app/models/concerns/mods_solr_document.rb` may take some time. The starting structure for your file will look like this:
+
+```
+# frozen_string_literal: true
+
+# build mods xml document: see https://www.loc.gov/standards/mods/mods-outline-3-5.html
+module ModsSolrDocument
+  extend ActiveSupport::Concern
+
+  def to_oai_mods
+    builder = Nokogiri::XML::Builder.new do |xml|
+      xml.mods('xmlns' => 'http://www.loc.gov/mods/v3',
+               'version' => '3.5',
+               'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
+               'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+               # rubocop:disable Metrics/LineLength
+               'xsi:schemaLocation' => 'http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd') do
+        # rubocop:enable Metrics/LineLength
+        
+        ## Following are the top level MODS elements. An example is provided for loading title.
+        ## You will need to create a method to manually map each term or terms which apply to that element. 
+
+        # titleInfo
+        load_title(xml)
+        # name
+        # typeOfResource
+        # identifier
+        # genre
+        # originInfo
+        # language
+        # physicalDescription
+        # tableOfContents
+        # targetAudience
+        # note
+        # subject
+        # relatedItem
+        # location
+        # accessCondition
+        # part
+        # extension
+        # recordInfo
+      end
+    end
+    Nokogiri::XML(builder.to_xml).root.to_xml
+  end
+
+  private
+
+    # titleInfo
+    def load_title(xml)
+      xml.titleInfo do
+        title&.each { |title| xml.title title.to_s }
+        alternative_title&.each { |title| xml.title({ type: 'alternative' }, title.to_s) }
+      end
+    end
+end
+```
+
+See commit `d73fff8` for code implementing the new metadata format `oai_mods`.
 
 </details>
 
