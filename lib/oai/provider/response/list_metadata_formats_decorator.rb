@@ -6,6 +6,7 @@ module OAI::Provider::Response::ListMetadataFormatsDecorator
     (prefix == 'oai_dc') ||
       (prefix == 'oai_hyku') ||
       (prefix == 'oai_testing') ||
+      (prefix == 'mods') ||
       record.respond_to?("to_#{prefix}") ||
       record.respond_to?("map_#{prefix}")
   end

@@ -8,7 +8,8 @@ class SolrDocument
 
   # Adds Hyrax behaviors to the SolrDocument.
   include Hyrax::SolrDocumentBehavior
-
+  include ModsSolrDocument
+  
   # self.unique_key = 'id'
 
   # Email uses the semantic field mappings below to generate the body of an email.
