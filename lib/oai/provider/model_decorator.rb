@@ -3,6 +3,17 @@
 module OAI
   module Provider
     module ModelDecorator
+      def map_oai_testing
+        {
+          title: :title,
+          abstract: :abstract,
+          publisher: :publisher,
+          subject: :subject,
+          license: :license,
+          date: :date_created
+        }
+      end
+      
       # Map Qualified Dublin Core (Terms) fields to PALNI/PALCI fields
       def map_oai_hyku
         {
