@@ -40,7 +40,7 @@ class SolrDocument
     language: 'language_tesim',
     publisher: 'publisher_tesim',
     relation: 'nesting_collection__pathnames_ssim',
-    rights: 'rights_statement_tesim',
+    rights: ['rights_statement_tesim', 'license_tesim', 'rights_notes_tesim', 'access_right_tesim'],
     subject: 'subject_tesim',
     title: 'title_tesim',
     type: 'human_readable_type_tesim'
