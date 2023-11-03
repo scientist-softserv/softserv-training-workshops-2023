@@ -5,7 +5,9 @@ class CreateAccount
   attr_reader :account, :users
 
   ##
-  # @param [Account]
+  # @param account [Account]
+  # @param users [Array<::User>] an array of initial {::User} objects that
+  #        are processed via {#add_initial_users}.
   def initialize(account, users = [])
     @account = account
     @users = users
