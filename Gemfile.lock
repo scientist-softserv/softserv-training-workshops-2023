@@ -152,12 +152,14 @@ GEM
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
+    backport (1.2.0)
     bagit (0.4.5)
       docopt (~> 0.5.0)
       validatable (~> 1.6)
     bcp47 (0.3.3)
       i18n
     bcrypt (3.1.18)
+    benchmark (0.2.1)
     benchmark_methods (0.7)
     better_html (1.0.16)
       actionview (>= 4.0)
@@ -411,6 +413,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-schema (~> 1.11, >= 1.11.0)
       zeitwerk (~> 2.6)
+    e2mmap (0.1.0)
     easy_translate (0.5.1)
       thread
       thread_safe
@@ -615,6 +618,7 @@ GEM
     is_it_working (1.1.0)
     iso-639 (0.3.6)
     iso8601 (0.9.1)
+    jaro_winkler (1.5.6)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -662,6 +666,10 @@ GEM
     kaminari-core (1.2.2)
     kaminari_route_prefix (0.1.1)
       kaminari (~> 1.0)
+    kramdown (2.4.0)
+      rexml
+    kramdown-parser-gfm (1.1.0)
+      kramdown (~> 2.0)
     language_list (1.2.1)
     latex-decode (0.4.0)
     launchy (2.5.2)
@@ -983,6 +991,8 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     retriable (3.1.2)
+    reverse_markdown (2.1.1)
+      nokogiri
     rexml (3.2.5)
     riiif (1.7.1)
       deprecation (>= 1.0.0)
@@ -1104,6 +1114,20 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
+    solargraph (0.40.1)
+      backport (~> 1.1)
+      benchmark
+      bundler (>= 1.17.2)
+      e2mmap
+      jaro_winkler (~> 1.5)
+      kramdown (~> 2.3)
+      kramdown-parser-gfm (~> 1.1)
+      parser (~> 2.3)
+      reverse_markdown (>= 1.0.5, < 3)
+      rubocop (>= 0.52)
+      thor (~> 1.0)
+      tilt (~> 2.0)
+      yard (~> 0.9, >= 0.9.24)
     solr_wrapper (2.2.0)
       faraday
       retriable
@@ -1207,6 +1231,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yard (0.9.34)
     zeitwerk (2.6.8)
 
 PLATFORMS
@@ -1285,6 +1310,7 @@ DEPENDENCIES
   shoulda-matchers (~> 4.0)
   sidekiq (< 7.0)
   simplecov
+  solargraph
   solr_wrapper (~> 2.0)
   spring (~> 1.7)
   spring-watcher-listen (~> 2.0.0)
