@@ -20,6 +20,7 @@
         -   [Include a Module](#org019d323)
         -   [ActiveSupport::Concern](#orge1779ff)
         -   [Prepend](#org93926e2)
+		-   [Singleton Class and Prepnd](#singleton-class-and-prepend)
         -   [Method Location](#orgf720564)
         -   [Where Are You Super…Man?](#orga03bc5b)
             -   [Exercise](#org5b3a530)
@@ -333,6 +334,36 @@ The operative word for `Module#prepend` is “overlay” and for `Module#include
 Put another way, `include` is courteous and lines up as it happens and is added to the ancestor chain.  And `prepend` waits until the `include` line forms, shows up late, and budges in front of everyone in the ancestor chain.
 
 Or use `prepend` when you want to nudge/push something towards your desired behavior; such as when you want to “Decorate.”
+
+<a id="singleton-class-and-prepend"></a>
+
+#### Singleton Class and Prepend
+
+As you might expect in Ruby, there's more than one way to add class methods.
+
+```ruby
+class Dog
+  def self.species
+    "dog"
+  end
+end
+
+module Stuffed
+  def species
+    "stuffed #{super}"
+  end
+end
+
+puts Dog.species
+# "dog"
+
+Dog.singleton_class.prepend(Stuffed)
+
+puts Dog.species
+# "stuffed dog"
+```
+
+The above approach is useful for the prepending of behavior onto a class's methods.
 
 
 <a id="orgf720564"></a>
