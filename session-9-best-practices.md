@@ -670,6 +670,6 @@ Add the [OrderAlready gem](https://github.com/samvera-labs/order_already) to you
 
 Write a test for these changes.  I recommend creating `spec/models/generic_work_spec.rb` and `spec/models/image_spec.rb`.
 
-See the [session-9-exercise-add-solargraph branch](https://github.com/scientist-softserv/softserv-training-workshops-2023/pull/new/session-9-exercise-order-already) for an approach.
+See the [session-9-exercise-order-already branch](https://github.com/scientist-softserv/softserv-training-workshops-2023/pull/new/session-9-exercise-order-already) for an approach.
 
 </details>
