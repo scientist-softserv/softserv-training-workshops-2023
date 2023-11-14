@@ -1,12 +1,5 @@
-name: "Build"
-run-name: Build of ${{ github.ref_name }} by @${{ github.actor }}
+name: "Build Solr"
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -20,7 +13,5 @@ jobs:
     uses: scientist-softserv/actions/.github/workflows/build.yaml@v0.0.14
     secrets: inherit
     with:
-      platforms: "linux/amd64" # "linux/amd64,linux/arm64"
-      webTarget: hyku-web
+      platforms: "linux/amd64"
       solrTarget: hyku-solr
-      workerTarget: hyku-worker

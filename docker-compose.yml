@@ -5,9 +5,8 @@ x-app: &app
     context: .
     target: hyku-web
     cache_from:
-      - ghcr.io/samvera/hyku/base:${TAG:-latest}
-      - ghcr.io/samvera/hyku:${TAG:-latest}
-  image: ghcr.io/samvera/hyku:${TAG:-latest}
+      - ghcr.io/scientist-softserv/softserv-training-workshops-2023:${TAG:-latest}
+  image: ghcr.io/scientist-softserv/softserv-training-workshops-2023:${TAG:-latest}
   user: ${CONTAINER_UID}:${CONTAINER_GID}
   env_file:
     - .env
@@ -54,9 +53,11 @@ services:
       timeout: "8s"
 
   solr:
-    image: ghcr.io/samvera/hyku/solr:${TAG:-latest}
+    platform: 'linux/amd64'
+    image: ghcr.io/scientist-softserv/softserv-training-workshops-2023/solr:${TAG:-latest}
     build:
       context: solr
+      target: hyku-solr
       dockerfile: Dockerfile
     environment:
       - OOM=script
@@ -123,13 +124,15 @@ services:
   # Used exclusively for building and caching the base image to reduce build times
   base:
     <<: *app
-    image: ghcr.io/samvera/hyku/base:${TAG:-latest}
+    platform: 'linux/amd64'
+    image: ghcr.io/scientist-softserv/softserv-training-workshops-2023/base:${TAG:-latest}
     build:
       context: .
       target: hyku-base
 
   web:
     <<: *app
+    platform: 'linux/amd64'
     # Uncomment command to access container with out starting Rails. Useful for debugging
     # command: sleep infinity
     environment:
@@ -159,13 +162,14 @@ services:
 
   worker:
     <<: *app
-    image: ghcr.io/samvera/hyku/worker:${TAG:-latest}
+    platform: 'linux/amd64'
+    image: ghcr.io/scientist-softserv/softserv-training-workshops-2023/worker:${TAG:-latest}
     build:
       context: .
       target: hyku-worker
       cache_from:
-        - ghcr.io/samvera/hyku:${TAG:-latest}
-        - ghcr.io/samvera/hyku/worker:${TAG:-latest}
+        - ghcr.io/scientist-softserv/softserv-training-workshops-2023:${TAG:-latest}
+        - ghcr.io/scientist-softserv/softserv-training-workshops-2023/worker:${TAG:-latest}
     command: bundle exec sidekiq
     depends_on:
       check_volumes:
