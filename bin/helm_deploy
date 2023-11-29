@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 # This script wraps up helm deployment. It is meant as a clear starting point for
 # commandline deployment or CI based deployment. It requires the following ENV vars be set
 #
@@ -12,32 +13,22 @@
 
 if [ -z "$1" ] || [ -z "$2" ]
 then
-    echo './bin/deploy RELEASE_NAME NAMESPACE'
+    echo './bin/helm_deploy RELEASE_NAME NAMESPACE'
     exit 1
 fi
 release_name="${1}"
 namespace="${2}"
 
-CHART_VERSION="${CHART_VERSION:-2.0.0}"
-
-DEPLOY_IMAGE="${DEPLOY_IMAGE:-ghcr.io/samvera/hyku}"
-WORKER_IMAGE="${WORKER_IMAGE:-ghcr.io/samvera/hyku/worker}"
-DEPLOY_TAG="${DEPLOY_TAG:-latest}"
-WORKER_TAG="${WORKER_TAG:-$DEPLOY_TAG}"
-echo $DEPLOY_TAG
+CHART_VERSION="${CHART_VERSION:-3.5.0}"
 
 helm pull --untar oci://ghcr.io/samvera/charts/hyrax --version $CHART_VERSION
-helm repo update
+HELM_EXPERIMENTAL_OCI=1 helm dependency update hyrax
 
 helm upgrade \
     --install \
     --atomic \
-    --timeout 15m0s \
-    --set image.repository="$DEPLOY_IMAGE" \
-    --set image.tag="$DEPLOY_TAG" \
-    --set worker.image.repository="$WORKER_IMAGE" \
-    --set worker.image.tag="$DEPLOY_TAG" \
-    $HELM_EXTRA_ARGS \
+    --timeout 25m0s \
+    --values ops/test-deploy.yaml \
     --namespace="$namespace" \
     --create-namespace \
     "$release_name" \

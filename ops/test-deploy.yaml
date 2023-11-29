@@ -1,0 +1,600 @@
+# Default values for hyrax.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# TODO:
+# Need to convert secrets to env variables
+# ~~Need to change all instances of hyrax to hyku as possible~~
+# Then Check this out on the softserv-training-workshops-2023 branch
+# Make URL items comprised of the SOLR components:
+# SOLR_COLLECTION_NAME="${SOLR_COLLECTION}" which should be hyku
+# SOLR_URL="http://${SOLR_ADMIN_USER}:${SOLR_ADMIN_PASSWORD}@${SOLR_HOST}:${SOLR_PORT}/solr/"
+# Find out how to create RWM (nfs) Volume so we can enable the uploads/derivatives/branding
+# How to tie in external secrets for the postgresql and solr
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/scientist-softserv/softserv-training-workshops-2023
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1bdbe573"
+
+# use true to skip loading Hyrax engine database seed file
+skipHyraxEngineSeed: false
+# use true to skip running the `db-setup` initContainer
+# this may be desirable for downstream chart users to customize their database setup
+skipDbMigrateSeed: false
+
+# use false to skip the configset management init container
+loadSolrConfigSet: true
+# the host and auth details for an external solr service;
+#   ignored if `solr.enabled` is true
+solrExistingSecret: ""
+externalSolrHost: ""
+externalSolrPort: ""
+externalSolrUser: ""
+externalSolrPassword: ""
+externalSolrCollection: "hyku"
+
+## Extra init containers
+## Example
+##
+## extraInitContainers:
+##   - name: do-something
+##     image: busybox
+##     command: ['echo', 'Hello, Hyku.']
+##
+extraInitContainers: []
+
+# Extra envFrom (secrets/configmaps)
+# Example
+#
+# extraEnvFrom:
+#   - configMapRef:
+#       name: existingConfigMap
+#   - secretRef:
+#       name: existingSecret
+#
+extraEnvFrom: []
+
+# Extra container spec configuration
+# Example: (enabling pry debugging for local development)
+# Note: with this enabled, one can `kubectl attach` to a running container with a binding.pry breakpoint
+#
+#extraContainerConfiguration:
+# stdin: true
+# tty: true
+extraContainerConfiguration: []
+
+## @param extraDeploy Array of extra objects to deploy with the release (evaluated as a template)
+##
+extraDeploy: []
+
+# an existing volume containing a Hyrax-based application
+# must be a ReadWriteMany volume if worker is enabled
+applicationExistingClaim: ""
+
+brandingVolume:
+  enabled: true
+  # the name of an existing volume claim; must be an ReadWriteMany volume
+  existingClaim: ""
+  size: 2Gi
+  storageClass: "nfs"
+
+derivativesVolume:
+  enabled: true
+  # the name of an existing volume claim; must be an ReadWriteMany volume
+  existingClaim: ""
+  size: 10Gi
+  storageClass: "nfs"
+
+uploadsVolume:
+  enabled: true
+  # the name of an existing volume claim; must be an ReadWriteMany volume
+  existingClaim: ""
+  size: 20Gi
+  storageClass: "nfs"
+
+# additional volumes and volume mounts, evaluated as a template, e.g.
+#
+extraVolumeMounts: &volMounts
+  - name: uploads
+    mountPath: /app/samvera/hyrax-webapp/tmp/imports
+    subPath: imports
+  - name: uploads
+    mountPath: /app/samvera/hyrax-webapp/tmp/exports
+    subPath: exports
+  - name: uploads
+    mountPath: /app/samvera/hyrax-webapp/public/system
+    subPath: public-system
+  - name: uploads
+    mountPath: /app/samvera/hyrax-webapp/public/uploads
+    subPath: public-uploads
+  - name: uploads
+    mountPath: /app/samvera/hyrax-webapp/tmp/network_files
+    subPath: network-files
+
+extraVolumes: []
+
+# configuration for an external/existing fcrepo service;
+#   ignored if `fcrepo.enabled` is true
+externalFcrepoHost: ""
+fcrepoBasePathOverride: ""
+
+# database configuration for an external postgresql;
+#   ignored if `postgresql.enabled` is true
+externalPostgresql: {}
+#  username:
+#  password:
+#  database:
+#  port:
+
+embargoRelease:
+  enabled: false
+  schedule: "0 0 * * *"
+leaseRelease:
+  enabled: false
+  schedule: "0 0 * * *"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  }
+  hosts:
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+    - host: "*.localhost"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# additional environment variables, evaluated as a template. e.g.
+#
+extraEnvVars: &envVars
+  - name: CHROME_HOSTNAME
+    value: chrome
+  - name: COMPOSE_DOCKER_CLI_BUILD
+    value: "1"
+  - name: CONFDIR
+    value: "/app/samvera/hyrax-webapp/solr/conf"
+  - name: DB_ADAPTER
+    value: postgresql
+  - name: DB_HOST
+    value: hyku-postgresql
+  - name: DB_NAME
+    value: hyku
+  - name: DB_PASSWORD
+    value: hyku_pass
+    # $DB_PASSWORD
+  - name: DB_PORT
+    value: "5432"
+  - name: DB_TEST_NAME
+    value: hyku_test
+  - name: DB_USER
+    value: hyku
+  - name: DOCKER_BUILDKIT
+    value: "1"
+  - name: FCREPO_BASE_PATH
+    value: /hyku
+  - name: FCREPO_HOST
+    value: hyku-fcrepo
+  - name: FCREPO_PORT
+    value: "8080"
+  - name: FCREPO_REST_PATH
+    value: rest
+  - name: HELM_EXPERIMENTAL_OCI
+    value: "1"
+  - name: HYKU_ADMIN_HOST
+    value: "localhost"
+  - name: HYKU_ADMIN_ONLY_TENANT_CREATION
+    value: "true"
+  - name: HYKU_CONTACT_EMAIL
+    value: samvera@example.com
+  - name: HYKU_DEFAULT_HOST
+    value: "%{tenant}.localhost"
+  - name: HYKU_ENABLED
+    value: "true"
+  - name: HYKU_MULTITENANT
+    value: "true"
+  - name: HYKU_ROOT_HOST
+    value: "localhost"
+  - name: HYKU_USER_DEFAULT_PASSWORD
+    value: password
+    # $HYKU_USER_DEFAULT_PASSWORD
+  - name: HYRAX_ACTIVE_JOB_QUEUE
+    value: sidekiq
+  - name: HYRAX_ANALYTICS
+    value: "false"
+  - name: HYRAX_FITS_PATH
+    value: /app/fits/fits.sh
+  - name: INITIAL_ADMIN_EMAIL
+    value: admin@example.com
+  - name: INITIAL_ADMIN_PASSWORD
+    value: testing123
+    # $INITIAL_ADMIN_PASSWORD
+  - name: IN_DOCKER
+    value: "true"
+  - name: JAVA_OPTS
+    value: -Xmx4g -Xms1g
+  - name: LD_LIBRARY_PATH
+    value: /app/fits/tools/mediainfo/linux
+  - name: NEGATIVE_CAPTCHA_SECRET
+    value: 'abc12345678910'
+    # $NEGATIVE_CAPTCHA_SECRET
+  - name: PASSENGER_APP_ENV
+    value: production
+  - name: RAILS_ENV
+    value: production
+  - name: RAILS_LOG_TO_STDOUT
+    value: "true"
+  - name: RAILS_MAX_THREADS
+    value: "5"
+  - name: RAILS_SERVE_STATIC_FILES
+    value: "true"
+  - name: REDIS_HOST
+    value: hyku-redis-master
+  - name: SECRET_KEY_BASE
+    value: asdf
+    # $SECRET_KEY_BASE
+  - name: SOLR_ADMIN_PASSWORD
+    value: admin
+    # $SOLR_ADMIN_PASSWORD
+  - name: SOLR_COLLECTION_NAME
+    value: hyku
+  - name: SOLR_ADMIN_USER
+    value: admin
+  - name: SOLR_HOST
+    value: hyku-solr
+  - name: SOLR_PORT
+    value: "8983"
+  - name: SOLR_URL
+    value: "http://admin:admin@hyku-solr:8983/solr/"
+    # "http://${SOLR_ADMIN_USER}:${SOLR_ADMIN_PASSWORD}@${SOLR_HOST}:${SOLR_PORT}/solr/"
+
+livenessProbe:
+  enabled: false
+  # path: "/healthz"
+  # initialDelaySeconds: 0
+  # periodSeconds: 10
+  # timeoutSeconds: 10
+  # failureThreshold: 3
+  # successThreshold: 1
+
+readinessProbe:
+  enabled: false
+  # path: "/healthz"
+  # initialDelaySeconds: 5
+  # periodSeconds: 10
+  # timeoutSeconds: 5
+  # failureThreshold: 6
+  # successThreshold: 1
+
+resources: {}
+
+worker:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: ghcr.io/scientist-softserv/softserv-training-workshops-2023/worker
+    pullPolicy: IfNotPresent
+    tag: "1bdbe573"
+  extraEnvVars: *envVars
+  extraInitContainers: []
+  extraVolumeMounts: *volMounts
+  extraVolumes: []
+  imagePullSecrets: []
+  podSecurityContext:
+    runAsUser: 1001
+    runAsGroup: 101
+    fsGroup: 101
+    fsGroupChangePolicy: "OnRootMismatch"
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+
+  # see: https://github.com/mperham/sidekiq/wiki/Kubernetes#health-checks
+  readinessProbe:
+    enabled: false
+    # command:
+    #  - cat
+    #  - /app/samvera/hyrax-webapp/tmp/sidekiq_process_has_started_and_will_begin_processing_jobs
+    # initialDelaySeconds: 10
+    # periodSeconds: 2
+    # timeoutSeconds: 1
+    # failureThreshold: 10
+    # successThreshold: 2
+
+podSecurityContext:
+  runAsUser: 1001
+  runAsGroup: 101
+  fsGroup: 101
+  fsGroupChangePolicy: "OnRootMismatch"
+
+fcrepo:
+  enabled: true
+  servicePort: 8080
+  postgresql:
+    enabled: false
+    image:
+      repository: bitnami/postgresql
+      tag: 12.11.0-debian-11-r12
+
+# configuration for an external/existing fits service;
+#   ignored if `fits.enabled` is true
+externalFits:
+  enabled: false
+  url: "" # existing FITS servlet endpoint
+
+fits:
+  enabled: true
+  servicePort: 8080
+  subPath: /fits
+
+memcached:
+  enabled: false
+  image:
+    repository: bitnami/memcached
+    tag: 1.6.15-debian-11-r12
+
+minio:
+  enabled: false
+  image:
+    repository: bitnami/minio
+    tag: 2022.7.4-debian-11-r0
+  auth:
+    rootUser: hyrax-access-key
+    rootPassword: hyrax-secret-key
+  persistence:
+    enabled: false
+  # defaultBuckets: bucketOne;bucketTwo
+
+postgresql:
+  enabled: true
+  image:
+    repository: bitnami/postgresql
+    tag: 12.11.0-debian-11-r12
+  auth:
+    database: hyku
+    password: hyku_pass # DB_PASSWORD
+    username: hyku
+  containerPorts:
+    postgresql: 5432
+  primary:
+    service:
+      ports:
+        postgresql: 5432
+  readReplicas:
+    service:
+      ports:
+        postgresql: 5432
+
+## Nginx proxy is used to keep puma from having to serve static assets
+## and to act as an auth proxy for Cantelope
+nginx:
+  service:
+    port: 80
+  enabled: false
+  image:
+    repository: bitnami/nginx
+    tag: 1.23.0-debian-11-r1
+  # The set up below does malicious bot / ip blocking and mounts
+  # volumes to allow nginx to server assets and other public directory items
+  # extraVolumes:
+  #   - name: "uploads"
+  #     persistentVolumeClaim:
+  #       claimName: {{ .Values.global.hyraxHostName }}-uploads
+  # extraVolumeMounts:
+  #   - name: uploads
+  #     mountPath: /app/samvera/hyrax-webapp/public/system
+  #     subPath: public-system
+  #   - name: uploads
+  #     mountPath: /app/samvera/hyrax-webapp/public/uploads
+  #     subPath: public-uploads
+  #   - name: uploads
+  #     mountPath: /app/samvera/hyrax-webapp/public/uv
+  #     subPath: public-uv
+  #   - name: uploads
+  #     mountPath: /app/samvera/hyrax-webapp/public/assets
+  #     subPath: public-assets
+  # serverBlock: |-
+  #   upstream rails_app {
+  #     server {{ .Values.global.hyraxHostName }};
+  #   }
+
+  #   map $status $loggable {
+  #       ~^444  0;
+  #       default 1;
+  #   }
+
+  #   log_format loki 'host=$host ip=$http_x_forwarded_for remote_user=$remote_user [$time_local] '
+  #                     'request="$request" status=$status bytes=$body_bytes_sent '
+  #                     'referer="$http_referer" agent="$http_user_agent" request_time=$request_time upstream_response_time=$upstream_response_time upstream_response_length=$upstream_response_length';
+
+  #   error_log  /opt/bitnami/nginx/logs/error.log warn;
+  #   #tcp_nopush     on;
+
+  #   # Cloudflare ips see for refresh
+  #   # https://support.cloudflare.com/hc/en-us/articles/200170786-Restoring-original-visitor-IPs-logging-visitor-IP-addresses
+  #   # update list https://www.cloudflare.com/ips/
+  #   set_real_ip_from 103.21.244.0/22;
+  #   set_real_ip_from 103.22.200.0/22;
+  #   set_real_ip_from 103.31.4.0/22;
+  #   set_real_ip_from 104.16.0.0/13;
+  #   set_real_ip_from 104.24.0.0/14;
+  #   set_real_ip_from 108.162.192.0/18;
+  #   set_real_ip_from 131.0.72.0/22;
+  #   set_real_ip_from 141.101.64.0/18;
+  #   set_real_ip_from 162.158.0.0/15;
+  #   set_real_ip_from 172.64.0.0/13;
+  #   set_real_ip_from 173.245.48.0/20;
+  #   set_real_ip_from 188.114.96.0/20;
+  #   set_real_ip_from 190.93.240.0/20;
+  #   set_real_ip_from 197.234.240.0/22;
+  #   set_real_ip_from 198.41.128.0/17;
+  #   set_real_ip_from 2400:cb00::/32;
+  #   set_real_ip_from 2606:4700::/32;
+  #   set_real_ip_from 2803:f800::/32;
+  #   set_real_ip_from 2405:b500::/32;
+  #   set_real_ip_from 2405:8100::/32;
+  #   set_real_ip_from 2a06:98c0::/29;
+  #   set_real_ip_from 2c0f:f248::/32;
+
+  #   real_ip_header X-Forwarded-For;
+  #   real_ip_recursive on;
+  #   include /opt/bitnami/nginx/conf/conf.d/*.conf;
+  #   server {
+  #       listen 8080;
+  #       server_name _;
+  #       root /app/samvera/hyrax-webapp/public;
+  #       index index.html;
+
+  #       client_body_in_file_only clean;
+  #       client_body_buffer_size 32K;
+  #       client_max_body_size 0;
+  #       access_log /opt/bitnami/nginx/logs/access.log loki;
+  #       # if=$loggable;
+
+  #       sendfile on;
+  #       send_timeout 300s;
+
+  #       include /opt/bitnami/nginx/conf/bots.d/ddos.conf;
+  #       include /opt/bitnami/nginx/conf/bots.d/blockbots.conf;
+
+  #       location ~ (\.php|\.aspx|\.asp) {
+  #       	return 404;
+  #       }
+
+  #       # deny requests for files that should never be accessed
+  #       location ~ /\. {
+  #         deny all;
+  #       }
+
+  #       location ~* ^.+\.(rb|log)$ {
+  #         deny all;
+  #       }
+
+  #       # serve static (compiled) assets directly if they exist (for rails production)
+  #       location ~ ^/(assets|packs|fonts|images|javascripts|stylesheets|swfs|system)/ {
+  #         try_files $uri @rails;
+
+  #         # access_log off;
+  #         gzip_static on; # to serve pre-gzipped version
+
+  #         expires max;
+  #         add_header Cache-Control public;
+
+  #         # Some browsers still send conditional-GET requests if there's a
+  #         # Last-Modified header or an ETag header even if they haven't
+  #         # reached the expiry date sent in the Expires header.
+  #         add_header Last-Modified "";
+  #         add_header ETag "";
+  #         break;
+  #       }
+
+  #       # send non-static file requests to the app server
+  #       location / {
+  #         try_files $uri @rails;
+  #       }
+
+  #       location @rails {
+  #         proxy_set_header  X-Real-IP  $remote_addr;
+  #         proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+  #         proxy_set_header Host $http_host;
+  #         proxy_redirect off;
+  #         proxy_pass http://rails_app;
+  #       }
+  #   }
+
+redis:
+  enabled: true
+  image:
+    repository: bitnami/redis
+    tag: 7.0.2-debian-11-r7
+  auth:
+    password: mysecret
+    # REDIS_PASSWORD
+
+solr:
+  enabled: true
+  image:
+    repository: bitnami/solr
+    tag: 8.11.2-debian-11-r4
+  containerPorts:
+    http: 8983
+  auth:
+    enabled: true
+    adminUsername: admin
+    adminPassword: admin
+    # $SOLR_ADMIN_PASSWORD
+  coreNames: hyku
+  collection: hyku
+  cloudBootstrap: true
+  cloudEnabled: true
+  persistence:
+    enabled: true
+  zookeeper:
+    enabled: true
+    persistence:
+      enabled: true
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+global:
+  # These global postgresql values are used by the fcrepo chart
+  postgresql:
+    auth:
+      username: hyku
+      password: hyku_pass
+      # $DB_PASSWORD
+  # This is the name of the running rails server pod
+  hyraxHostName: hyku
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# # create the cluster after install a thon
+# k3d cluster create dev-cluster --api-port 6550 -p 80:80@loadbalancer --agents 3
+
+# # helm deploy the chart
+# ./bin/helm_deploy hyku hyku
