@@ -3,9 +3,9 @@
 module OAI
   module Provider
     module MetadataFormat
-      class HykuDublinCore < OAI::Provider::Metadata::Format
+      class HykuTesting < OAI::Provider::Metadata::Format
         def initialize
-          @prefix = 'oai_hyku'
+          @prefix = 'oai_testing'
           @schema = 'http://dublincore.org/schemas/xmls/qdc/dcterms.xsd'
           @namespace = 'http://purl.org/dc/terms/'
           @element_namespace = 'hyku'
@@ -13,10 +13,7 @@ module OAI
           # Dublin Core Terms Fields
           # For new fields, add here first then add to #map_oai_hyku
           @fields = %i[
-            abstract access_right alternative_title based_near bibliographic_citation
-            contributor creator date_created date_modified date_uploaded depositor
-            description identifier keyword language license owner publisher related_url
-            resource_type rights_notes rights_statement source subject title
+            title abstract publisher subject license date
           ]
         end
 
@@ -73,6 +70,7 @@ module OAI
           {
             'xmlns:oai_dc' => "http://www.openarchives.org/OAI/2.0/oai_dc/",
             'xmlns:oai_hyku' => "http://www.openarchives.org/OAI/2.0/oai_dc/",
+            'xmlns:oai_testing' => "http://www.openarchives.org/OAI/2.0/oai_dc/",
             'xmlns:dc' => "http://purl.org/dc/elements/1.1/",
             'xmlns:dcterms' => "http://purl.org/dc/terms/",
             'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
@@ -84,4 +82,4 @@ module OAI
   end
 end
 
-OAI::Provider::Base.register_format(OAI::Provider::MetadataFormat::HykuDublinCore.instance)
+OAI::Provider::Base.register_format(OAI::Provider::MetadataFormat::HykuTesting.instance)

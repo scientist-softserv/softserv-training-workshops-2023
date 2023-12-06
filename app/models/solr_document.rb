@@ -8,7 +8,8 @@ class SolrDocument
 
   # Adds Hyrax behaviors to the SolrDocument.
   include Hyrax::SolrDocumentBehavior
-
+  include ModsSolrDocument
+  
   # self.unique_key = 'id'
 
   # Email uses the semantic field mappings below to generate the body of an email.
@@ -40,7 +41,7 @@ class SolrDocument
     language: 'language_tesim',
     publisher: 'publisher_tesim',
     relation: 'nesting_collection__pathnames_ssim',
-    rights: 'rights_statement_tesim',
+    rights: ['rights_statement_tesim', 'license_tesim', 'rights_notes_tesim', 'access_right_tesim'],
     subject: 'subject_tesim',
     title: 'title_tesim',
     type: 'human_readable_type_tesim'

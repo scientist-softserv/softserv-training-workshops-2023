@@ -5,6 +5,8 @@ module OAI::Provider::Response::ListMetadataFormatsDecorator
   def record_supports(record, prefix)
     (prefix == 'oai_dc') ||
       (prefix == 'oai_hyku') ||
+      (prefix == 'oai_testing') ||
+      (prefix == 'mods') ||
       record.respond_to?("to_#{prefix}") ||
       record.respond_to?("map_#{prefix}")
   end
