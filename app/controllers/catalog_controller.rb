@@ -73,6 +73,7 @@ class CatalogController < ApplicationController
     config.add_facet_field 'resource_type_sim', label: "Resource Type", limit: 5
     config.add_facet_field 'creator_sim', limit: 5
     config.add_facet_field 'contributor_sim', label: "Contributor", limit: 5
+    config.add_facet_field 'department_sim', label: "Department", limit: 5, helper_method: :department_terms
     config.add_facet_field 'keyword_sim', limit: 5
     config.add_facet_field 'subject_sim', limit: 5
     config.add_facet_field 'language_sim', limit: 5
@@ -109,6 +110,7 @@ class CatalogController < ApplicationController
     config.add_index_field 'identifier_tesim', helper_method: :index_field_link, field_name: 'identifier'
     config.add_index_field 'embargo_release_date_dtsi', label: "Embargo release date", helper_method: :human_readable_date
     config.add_index_field 'lease_expiration_date_dtsi', label: "Lease expiration date", helper_method: :human_readable_date
+    config.add_index_field 'department_tesim', label: "Department", helper_method: :department_terms
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
@@ -130,6 +132,7 @@ class CatalogController < ApplicationController
     config.add_show_field 'format_tesim'
     config.add_show_field 'identifier_tesim'
     config.add_show_field 'extent_tesim'
+    config.add_show_field 'contact_phone_tesim', label: "Contact Phone"
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields

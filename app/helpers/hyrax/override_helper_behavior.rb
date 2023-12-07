@@ -38,5 +38,15 @@ module Hyrax
       state.add_facet_params("#{facet.keys.first}_sim",
                              facet.values.first)
     end
+
+    def department_terms(options)
+      service = DepartmentsService
+
+      if options.is_a?(Hash) && options[:value].is_a?(Array)
+        options[:value].map { |department_id| service.label(department_id) }.join(', ')
+      else
+        service.label(options)
+      end
+    end
   end
 end
